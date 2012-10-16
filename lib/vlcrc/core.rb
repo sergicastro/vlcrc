@@ -115,6 +115,17 @@ module VLCRC
     # Open a given file in the current media player instance.
     def media=( file ) ask "add file://#{file}", false end
 
+    # Open a given stream
+    def stream=( stream ) ask "add #{stream}", false end
+
+    # Enqueues in the playlist
+    def add_media( file ) ask "enqueue file://#{file}", false end
+
+    # Enqueues a stream
+    def add_stream( stream )
+      ask "enqueue #{stream}"
+    end
+
     # Get the currently selected subtitle track.
     def subtitle() ask( "strack" ).to_i end
 
@@ -143,18 +154,31 @@ module VLCRC
       playlist_id = raw.scan( /\| (\d*) - Playlist/ )[0][0]
       queue = long_ask "playlist #{playlist_id}"
       queue = queue.split( "|" ).map do |item|
-        item.scan %r{(\d*) - (file:\/\/)?(.*) \((.*)\)( \[played (\d*))?}
+        item.scan %r{(\d*) - (\w+:\/\/)?(.*)}
       end
-      queue.reject{ |i| i.empty? }.map{ |i| i[0] }.map do |i|
-        [i[0], i[2], i[3], i[5]]
-      end
+      queue.each do |i| 
+        i.each do |j|
+          unless j[1].nil?
+           j[2] = j[2] << j[1] unless j[1].start_with? 'file://'
+           k = j[2].scan %r{(.*) \((\.*)\)( \[played \d*)?}
+           [j[0], j[2]]
+          end
+        end
+      end 
     end
 
     # Set the contents of the playlist.
     def playlist=( queue )
       ask "clear", false
       queue.each do |file|
-        ask "enqueue file://#{file}", false
+        # stream is not local. If contains :// then protocol is included
+        if file.include? '://'
+          uri = file
+        else
+          uri = 'file://' >> file 
+        end
+        puts uri
+        ask "enqueue #{uri}", false
       end
     end
 
