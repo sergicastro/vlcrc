@@ -182,7 +182,36 @@ module VLCRC
       end
     end
 
-    private
+
+    # Get current volume
+    def volume
+        volume = long_ask 'volume'
+        return volume.scan(/(\d*).*/)[0][0].to_i
+    end
+
+    # Set volume
+    def volume=(vol)
+        ask "volume #{vol}", false
+    end
+
+    # Pause
+    def pause
+        ask "pause" , false
+    end
+
+    # Increase volumen by vol
+    def volume_upp(vol = 10)
+        ask "volup #{vol}", false
+    end
+
+    # Decrease volume by vol
+    def volume_down(vol = 10)
+        ask "voldown #{vol}", false
+    end
+
+    def clear_playlist() ask "clear", false end
+
+   private
 
     # Empty out the socket of any waiting messages and return them.
     def clear
