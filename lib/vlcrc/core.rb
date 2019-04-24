@@ -14,7 +14,7 @@ module VLCRC
     # the opts parameter is a string that contains parameters to the VLC arg line.
     # An example of opts could be '--no-video' to supress the video output.
     def initialize( host='localhost', port=1234, bin_path='vlc', opts='' )
-      @host = 'localhost'
+      @host = host
       @port = port
       @bin = bin_path
       @extra_args ||= opts
